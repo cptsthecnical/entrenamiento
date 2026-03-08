@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>武士道 · Protocolo Bushidō Biológico</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;600;700;900&family=Zen+Antique+Soft&family=Shippori+Mincho+B1:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --black:#05040a; --deep:#0a080f; --panel:#0e0b14; --panel2:#110d18;
+  --red:#8b1a1a; --red2:#b52020; --red-glow:#e03010;
+  --gold:#c49a20; --gold2:#e0b840;
+  --ash:#2e2838; --mist:#7a6e80; --fog:#4a4055;
+  --white:#ede5d8; --white2:#c8bfb0;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+::-webkit-scrollbar{width:3px;}
+::-webkit-scrollbar-track{background:var(--black);}
+::-webkit-scrollbar-thumb{background:linear-gradient(var(--red),var(--gold));}
+body{background:var(--black);color:var(--white);font-family:'Noto Serif JP',serif;overflow-x:hidden;}
+#canvas{position:fixed;inset:0;pointer-events:none;z-index:0;}
+.vignette{position:fixed;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse at center,transparent 40%,rgba(5,4,10,0.85) 100%);}
+
+/* HERO */
+#hero{position:relative;z-index:2;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2rem;overflow:hidden;}
+.hero-stamp{position:absolute;font-family:'Zen Antique Soft',serif;color:rgba(139,26,26,0.07);line-height:1;pointer-events:none;animation:stampFloat 12s ease-in-out infinite;}
+.hero-stamp.s1{font-size:clamp(220px,45vw,580px);top:50%;left:50%;transform:translate(-50%,-50%);}
+.hero-stamp.s2{font-size:clamp(60px,12vw,130px);top:8%;right:6%;color:rgba(139,26,26,0.05);animation-delay:-4s;}
+.hero-stamp.s3{font-size:clamp(50px,9vw,110px);bottom:10%;left:5%;color:rgba(139,26,26,0.04);animation-delay:-8s;}
+@keyframes stampFloat{0%,100%{opacity:0.07;}50%{opacity:0.13;}}
+.hero-brush{position:absolute;inset:0;pointer-events:none;overflow:hidden;}
+.hero-brush::before{content:'';position:absolute;width:2px;height:0;background:linear-gradient(to bottom,transparent,var(--red2),transparent);left:50%;top:0;animation:brushLine 2.5s ease forwards 0.2s;}
+@keyframes brushLine{to{height:100%;}}
+.hero-mon{width:70px;height:70px;border:1px solid rgba(139,26,26,0.5);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;position:relative;opacity:0;animation:fadeUp 1s ease forwards 0.6s;}
+.hero-mon::before{content:'';position:absolute;inset:-4px;border-radius:50%;border:1px solid rgba(139,26,26,0.2);}
+.hero-mon-kanji{font-family:'Zen Antique Soft',serif;font-size:1.8rem;color:var(--red2);text-shadow:0 0 20px rgba(224,48,16,0.5);}
+.hero-eyebrow{font-size:0.62rem;letter-spacing:0.5em;text-transform:uppercase;color:var(--red2);margin-bottom:1rem;opacity:0;animation:fadeUp 1s ease forwards 0.9s;}
+.hero-title{font-family:'Zen Antique Soft',serif;font-size:clamp(3.5rem,10vw,8.5rem);font-weight:400;line-height:0.9;letter-spacing:-0.02em;background:linear-gradient(160deg,var(--white) 30%,var(--gold2) 60%,var(--red2) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;opacity:0;animation:fadeUp 1.2s ease forwards 1.1s;}
+.hero-sub{font-family:'Shippori Mincho B1',serif;font-size:clamp(0.9rem,2vw,1.2rem);letter-spacing:0.35em;color:var(--gold);margin:0.8rem 0 1.5rem;opacity:0;animation:fadeUp 1s ease forwards 1.4s;}
+.hero-row{display:flex;gap:2rem;justify-content:center;margin:1rem 0;opacity:0;animation:fadeUp 1s ease forwards 1.7s;}
+.hero-glyph{display:flex;flex-direction:column;align-items:center;gap:0.3rem;}
+.hero-glyph .k{font-family:'Zen Antique Soft',serif;font-size:2.5rem;color:var(--red2);text-shadow:0 0 25px rgba(224,48,16,0.4);line-height:1;}
+.hero-glyph .kl{font-size:0.52rem;letter-spacing:0.2em;color:var(--fog);text-transform:uppercase;}
+.hero-tagline{font-size:0.72rem;letter-spacing:0.15em;color:var(--mist);line-height:2;max-width:420px;margin:1.5rem auto 0;opacity:0;animation:fadeUp 1s ease forwards 2s;}
+.scroll-ind{margin-top:3rem;display:flex;flex-direction:column;align-items:center;gap:0.5rem;opacity:0;animation:fadeUp 1s ease forwards 2.3s;}
+.scroll-ind span{font-size:0.55rem;letter-spacing:0.4em;color:var(--fog);text-transform:uppercase;}
+.scroll-ind::after{content:'';width:1px;height:50px;background:linear-gradient(to bottom,var(--red2),transparent);animation:pulse 2s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:0.4;}50%{opacity:1;}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:200;background:rgba(5,4,10,0.95);backdrop-filter:blur(16px);border-bottom:1px solid rgba(139,26,26,0.35);display:flex;align-items:center;justify-content:space-between;padding:0 2rem;height:48px;}
+.nav-logo{font-family:'Zen Antique Soft',serif;font-size:1.6rem;color:var(--red2);text-shadow:0 0 20px rgba(224,48,16,0.5);line-height:1;}
+.nav-links{display:flex;gap:0;flex-wrap:wrap;}
+.nav-links a{color:var(--fog);text-decoration:none;font-size:0.58rem;letter-spacing:0.18em;padding:0.4rem 0.65rem;text-transform:uppercase;border-right:1px solid rgba(139,26,26,0.15);transition:all 0.25s;position:relative;}
+.nav-links a::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:var(--red2);transform:scaleX(0);transition:transform 0.25s;}
+.nav-links a:hover{color:var(--white);}
+.nav-links a:hover::after{transform:scaleX(1);}
+
+/* MAIN */
+main{position:relative;z-index:2;}
+
+/* DIVIDER */
+.sec-div{display:flex;align-items:center;gap:1.2rem;padding:0 3rem;margin:0.5rem 0;}
+.sec-div::before,.sec-div::after{content:'';flex:1;height:1px;background:linear-gradient(to right,transparent,rgba(139,26,26,0.4),transparent);}
+.sec-div-sym{font-family:'Zen Antique Soft',serif;color:var(--red2);font-size:1.3rem;opacity:0.6;}
+
+/* SECTION TITLE */
+.sec-title{text-align:center;margin-bottom:3rem;}
+.sec-title .big-k{font-family:'Zen Antique Soft',serif;font-size:clamp(3rem,6vw,5rem);color:rgba(139,26,26,0.18);display:block;line-height:1;}
+.sec-title h2{font-family:'Zen Antique Soft',serif;font-size:clamp(1.3rem,3vw,2.2rem);letter-spacing:0.25em;color:var(--white);margin:0.3rem 0;}
+.sec-title p{font-size:0.62rem;color:var(--fog);letter-spacing:0.3em;text-transform:uppercase;}
+
+/* PHILOSOPHY */
+#filosofia{padding:5rem 2rem;background:linear-gradient(180deg,#080610 0%,#0b0812 100%);border-top:1px solid rgba(139,26,26,0.25);border-bottom:1px solid rgba(139,26,26,0.25);}
+.philo-grid{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1px;border:1px solid rgba(139,26,26,0.15);background:rgba(139,26,26,0.1);}
+.philo-item{background:var(--panel);padding:1.4rem 1.2rem;position:relative;overflow:hidden;transition:all 0.35s;cursor:default;}
+.philo-item::before{content:'';position:absolute;top:0;left:0;width:2px;height:100%;background:var(--red);transform:scaleY(0);transition:transform 0.35s ease;transform-origin:bottom;}
+.philo-item::after{content:attr(data-k);position:absolute;bottom:-0.15em;right:0.1em;font-family:'Zen Antique Soft',serif;font-size:4rem;color:rgba(139,26,26,0.06);pointer-events:none;line-height:1;transition:all 0.35s;}
+.philo-item:hover{background:var(--panel2);transform:translateX(3px);}
+.philo-item:hover::before{transform:scaleY(1);}
+.philo-item:hover::after{color:rgba(139,26,26,0.13);}
+.philo-jp{font-family:'Zen Antique Soft',serif;font-size:0.9rem;color:var(--gold2);letter-spacing:0.05em;display:block;margin-bottom:0.3rem;}
+.philo-es{font-size:0.65rem;color:var(--mist);line-height:1.7;letter-spacing:0.05em;}
+
+/* DAY SECTION */
+.day-sec{border-bottom:1px solid rgba(139,26,26,0.12);}
+.day-banner{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:1.5rem;padding:2rem 3rem 1.5rem;background:linear-gradient(90deg,rgba(139,26,26,0.12) 0%,transparent 60%);border-bottom:1px solid rgba(139,26,26,0.2);position:relative;overflow:hidden;}
+.day-banner::after{content:attr(data-dk);position:absolute;right:2rem;top:50%;transform:translateY(-50%);font-family:'Zen Antique Soft',serif;font-size:8rem;color:rgba(139,26,26,0.07);pointer-events:none;line-height:1;transition:all 0.4s;}
+.day-sec:hover .day-banner::after{color:rgba(139,26,26,0.14);}
+.day-num{font-family:'Zen Antique Soft',serif;font-size:3.5rem;color:rgba(139,26,26,0.25);line-height:1;width:3rem;text-align:center;}
+.day-jp{font-family:'Zen Antique Soft',serif;font-size:clamp(1.5rem,4vw,2.8rem);line-height:1;letter-spacing:0.04em;background:linear-gradient(120deg,var(--white),var(--white2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.day-el{font-size:0.65rem;letter-spacing:0.25em;text-transform:uppercase;margin-top:0.4rem;display:flex;align-items:center;gap:0.6rem;}
+.dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--red2);box-shadow:0 0 8px var(--red2);}
+.el-name{color:var(--red2);}
+.el-sub{color:var(--fog);}
+.time-badge{border:1px solid rgba(201,154,32,0.3);padding:0.5rem 1rem;text-align:center;flex-shrink:0;z-index:1;}
+.time-badge .t{font-family:'Zen Antique Soft',serif;font-size:1.4rem;color:var(--gold);display:block;line-height:1;}
+.time-badge .tl{font-size:0.55rem;letter-spacing:0.2em;color:var(--fog);text-transform:uppercase;}
+
+/* BLOCKS */
+.day-blocks{display:flex;flex-direction:column;gap:1px;background:rgba(139,26,26,0.08);padding:1px;}
+.block{background:var(--panel);padding:1.4rem 1.6rem 1.6rem;position:relative;overflow:hidden;transition:background 0.3s;width:100%;}
+.block:hover{background:var(--panel2);}
+.block-full{}
+.bh{display:flex;align-items:center;gap:0.7rem;margin-bottom:1.1rem;padding-bottom:0.8rem;border-bottom:1px solid rgba(139,26,26,0.2);}
+.bicon{font-size:1.3rem;line-height:1;}
+.btitle{font-family:'Shippori Mincho B1',serif;font-size:0.82rem;font-weight:600;letter-spacing:0.08em;color:var(--white);line-height:1.2;}
+.bjp{font-family:'Zen Antique Soft',serif;font-size:0.7rem;color:var(--red2);margin-top:0.1rem;letter-spacing:0.05em;}
+.btime{margin-left:auto;font-size:0.58rem;letter-spacing:0.1em;color:var(--gold);border:1px solid rgba(201,154,32,0.25);padding:0.2rem 0.45rem;flex-shrink:0;white-space:nowrap;}
+
+/* EXERCISE LIST */
+.exl{list-style:none;display:flex;flex-direction:column;gap:0;}
+.exi{display:flex;align-items:flex-start;gap:0;padding:0.6rem 0;border-bottom:1px solid rgba(139,26,26,0.08);transition:all 0.2s;}
+.exi:last-child{border-bottom:none;}
+.exi:hover{padding-left:0.5rem;}
+.exi:hover .eg{color:var(--red-glow);text-shadow:0 0 10px rgba(224,48,16,0.6);}
+.eg{font-family:'Zen Antique Soft',serif;font-size:0.8rem;color:var(--red);flex-shrink:0;width:1.4rem;padding-top:0.05em;transition:all 0.2s;}
+.eb{flex:1;}
+.en{font-size:0.73rem;color:var(--white2);line-height:1.5;letter-spacing:0.03em;}
+.enote{font-size:0.62rem;color:var(--fog);line-height:1.5;margin-top:0.1rem;font-style:italic;}
+.er{display:flex;flex-direction:column;align-items:flex-end;gap:0.2rem;flex-shrink:0;margin-left:0.6rem;}
+.ereps{font-size:0.6rem;color:var(--gold);letter-spacing:0.08em;border:1px solid rgba(201,154,32,0.2);padding:0.1rem 0.4rem;white-space:nowrap;}
+.elink{font-size:0.58rem;color:var(--red2);text-decoration:none;border-bottom:1px solid rgba(139,26,26,0.3);letter-spacing:0.05em;white-space:nowrap;transition:all 0.2s;}
+.elink:hover{color:var(--red-glow);border-color:var(--red-glow);}
+
+/* MISOGI BAND */
+.misogi-band{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid rgba(139,26,26,0.15);}
+.mc{padding:1.5rem 2rem;display:flex;align-items:center;gap:1.2rem;border-right:1px solid rgba(139,26,26,0.12);transition:background 0.3s;}
+.mc:last-child{border-right:none;}
+.mc:hover{background:rgba(139,26,26,0.07);}
+.mi{font-size:2rem;line-height:1;flex-shrink:0;}
+.mn{font-family:'Shippori Mincho B1',serif;font-size:0.78rem;color:var(--white);letter-spacing:0.08em;font-weight:600;}
+.md{font-size:0.63rem;color:var(--fog);margin-top:0.2rem;line-height:1.5;}
+
+/* BREATHING */
+#respiracion{padding:5rem 2rem;background:linear-gradient(180deg,#060410 0%,#08060e 100%);text-align:center;border-top:1px solid rgba(139,26,26,0.2);}
+.breath-wrap{display:flex;flex-direction:column;align-items:center;margin:2.5rem 0;}
+.bo{width:200px;height:200px;position:relative;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.br1{position:absolute;inset:0;border-radius:50%;border:1px solid rgba(139,26,26,0.3);}
+.br2{position:absolute;inset:12px;border-radius:50%;border:1px solid rgba(139,26,26,0.15);}
+.bc{width:100px;height:100px;border-radius:50%;border:2px solid var(--red2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.2rem;box-shadow:0 0 25px rgba(139,26,26,0.25),inset 0 0 20px rgba(139,26,26,0.08);transition:all 0.5s ease;z-index:1;}
+.bc .bk{font-family:'Zen Antique Soft',serif;font-size:1.8rem;color:var(--red2);line-height:1;}
+.bc .bl{font-size:0.5rem;letter-spacing:0.2em;color:var(--fog);text-transform:uppercase;}
+.bo:hover .bc{box-shadow:0 0 40px rgba(224,48,16,0.4),inset 0 0 30px rgba(139,26,26,0.15);}
+.bo.inhale .bc{animation:breathIn 4s ease-in-out forwards;}
+.bo.exhale .bc{animation:breathOut 7s ease-in-out forwards;}
+@keyframes breathIn{to{transform:scale(1.5);box-shadow:0 0 60px rgba(224,48,16,0.5),inset 0 0 40px rgba(139,26,26,0.2);}}
+@keyframes breathOut{to{transform:scale(0.8);box-shadow:0 0 10px rgba(139,26,26,0.1);}}
+.bstatus{font-size:0.68rem;letter-spacing:0.3em;color:var(--mist);text-transform:uppercase;margin-top:1.5rem;height:1.5rem;transition:all 0.4s;}
+.btimer{font-family:'Zen Antique Soft',serif;font-size:2rem;color:var(--red2);margin-top:0.5rem;opacity:0;transition:opacity 0.4s;text-shadow:0 0 20px rgba(224,48,16,0.4);}
+.btimer.show{opacity:1;}
+.binstr{max-width:420px;margin:2rem auto 0;font-size:0.68rem;color:var(--fog);line-height:2;letter-spacing:0.08em;}
+.bwim{margin-top:1.5rem;font-size:0.65rem;color:var(--fog);}
+.bwim a{color:var(--gold);text-decoration:none;border-bottom:1px solid rgba(201,154,32,0.3);}
+
+/* BIOHACKING */
+#biohacking{padding:5rem 2rem;background:#07050b;}
+.bio-grid{max-width:900px;margin:2.5rem auto 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1px;background:rgba(139,26,26,0.1);border:1px solid rgba(139,26,26,0.15);}
+.bio-item{background:var(--panel);padding:1.5rem 1.2rem;text-align:center;transition:all 0.3s;cursor:default;}
+.bio-item:hover{background:var(--panel2);}
+.bioi{font-size:1.8rem;display:block;margin-bottom:0.6rem;}
+.bion{font-family:'Shippori Mincho B1',serif;font-size:0.72rem;font-weight:600;color:var(--gold2);letter-spacing:0.1em;display:block;margin-bottom:0.3rem;}
+.biod{font-size:0.6rem;color:var(--fog);line-height:1.6;letter-spacing:0.05em;}
+
+/* FOOTER */
+footer{padding:3rem 2rem;text-align:center;border-top:1px solid rgba(139,26,26,0.2);background:#04030a;position:relative;z-index:2;}
+.fk{font-family:'Zen Antique Soft',serif;font-size:4rem;color:rgba(139,26,26,0.2);display:block;line-height:1;margin-bottom:1rem;}
+footer p{font-size:0.62rem;color:var(--fog);letter-spacing:0.3em;text-transform:uppercase;line-height:2;}
+
+/* REVEAL */
+.reveal{opacity:0;transform:translateY(28px);transition:opacity 0.7s ease,transform 0.7s ease;}
+.reveal.visible{opacity:1;transform:translateY(0);}
+
+@media(max-width:700px){
+  .nav-links{display:none;}
+  .day-banner{grid-template-columns:1fr;padding:1.5rem;}
+  .day-banner::after{display:none;}
+  .day-num{display:none;}
+  .misogi-band{grid-template-columns:1fr;}
+  .day-blocks{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+<canvas id="canvas"></canvas>
+<div class="vignette"></div>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-stamp s1">武士道</div>
+  <div class="hero-stamp s2">剣</div>
+  <div class="hero-stamp s3">道</div>
+  <div class="hero-brush"></div>
+  <div class="hero-mon"><span class="hero-mon-kanji">武</span></div>
+  <p class="hero-eyebrow">Protocolo · Longevidad y Acero · 武士道生物学</p>
+  <h1 class="hero-title">Bushidō<br>Biológico</h1>
+  <p class="hero-sub">心 · 体 · 剣 · 道</p>
+  <div class="hero-row">
+    <div class="hero-glyph"><span class="k">心</span><span class="kl">Mente</span></div>
+    <div class="hero-glyph"><span class="k">体</span><span class="kl">Cuerpo</span></div>
+    <div class="hero-glyph"><span class="k">剣</span><span class="kl">Acero</span></div>
+    <div class="hero-glyph"><span class="k">道</span><span class="kl">Camino</span></div>
+  </div>
+  <p class="hero-tagline">El cuerpo es tu templo. El entrenamiento, tu camino sagrado.<br>La disciplina es tu armadura inmortal.</p>
+  <div class="scroll-ind"><span>Descender</span></div>
+</section>
+
+<nav>
+  <div class="nav-logo">武</div>
+  <div class="nav-links">
+    <a href="#filosofia">哲学 Filosofía</a>
+    <a href="#lunes">月 Lunes</a>
+    <a href="#martes">火 Martes</a>
+    <a href="#miercoles">水 Miércoles</a>
+    <a href="#jueves">木 Jueves</a>
+    <a href="#viernes">金 Viernes</a>
+    <a href="#finde">山 Montaña</a>
+    <a href="#respiracion">呼吸</a>
+    <a href="#biohacking">薬 Bio</a>
+  </div>
+</nav>
+
+<main>
+
+<!-- FILOSOFÍA -->
+<section id="filosofia">
+  <div class="sec-title reveal">
+    <span class="big-k">哲学</span>
+    <h2>Filosofía de Vida</h2>
+    <p>八つの道 · Las ocho vías del guerrero</p>
+  </div>
+  <div class="philo-grid">
+    <div class="philo-item reveal" data-k="腹"><span class="philo-jp">腹八分目 · Hara Hachi Bu</span><span class="philo-es">Comer hasta el 80% — control metabólico supremo del guerrero.</span></div>
+    <div class="philo-item reveal" data-k="気"><span class="philo-jp">気め · Kime</span><span class="philo-es">Tensión muscular máxima en cada repetición. Enfoque absoluto.</span></div>
+    <div class="philo-item reveal" data-k="禊"><span class="philo-jp">禊 · Misogi</span><span class="philo-es">Purificación por contraste de agua (Onsen/Sento). Limpieza del alma.</span></div>
+    <div class="philo-item reveal" data-k="巻"><span class="philo-jp">巻藁 · Makiwara</span><span class="philo-es">Forja de densidad ósea y enfoque mental. El poste del guerrero.</span></div>
+    <div class="philo-item reveal" data-k="茶"><span class="philo-jp">茶道 · Chadō</span><span class="philo-es">Té Matcha cada día — 1 a 2 tazas. El ritual diario del espíritu.</span></div>
+    <div class="philo-item reveal" data-k="無"><span class="philo-jp">無心 · Mushin</span><span class="philo-es">Mente vacía al entrenar. Sin pensamiento, solo acción pura.</span></div>
+    <div class="philo-item reveal" data-k="足"><span class="philo-jp">足湯 · Ashiyu</span><span class="philo-es">Baño de pies caliente con magnesio antes de dormir. Restauración.</span></div>
+    <div class="philo-item reveal" data-k="生"><span class="philo-jp">生き甲斐 · Ikigai</span><span class="philo-es">Entrena para proteger tu templo biológico. Razón de ser.</span></div>
+  </div>
+</section>
+
+<div class="sec-div"><span class="sec-div-sym">刀</span></div>
+
+<!-- LUNES -->
+<section class="day-sec reveal" id="lunes">
+  <div class="day-banner" data-dk="風">
+    <div class="day-num">一</div>
+    <div>
+      <div class="day-jp">月曜日 · Lunes</div>
+      <div class="day-el"><span class="dot"></span><span class="el-name">🌀 Día del Viento (Fu)</span><span class="el-sub">· El Escudo del Hara · Limpieza Linfática</span></div>
+    </div>
+    <div class="time-badge"><span class="t">40–74</span><span class="tl">minutos</span></div>
+  </div>
+  <div class="day-blocks">
+    <div class="block reveal">
+      <div class="bh"><div class="bicon">🌀</div><div><div class="btitle">Purificación del Hara</div><div class="bjp">浄化 · Cadera y tobillo</div></div><div class="btime">10 min</div></div>
+      <ul class="exl">
+        <li class="exi"><span class="eg">気</span><div class="eb"><div class="en">Movilidad cadera / anchura de pelvis</div></div><div class="er"><a class="elink" href="https://www.youtube.com/watch?v=mnTAxW1lOd4" target="_blank">▶ Ver</a></div></li>
+        <li class="exi"><span class="eg">気</span><div class="eb"><div class="en">Movilidad de tobillo y cadera</div></div><div class="er"><a class="elink" href="https://www.youtube.com/watch?v=AIWRrY2_L1E" target="_blank">▶ Ver</a></div></li>
+      </ul>
+    </div>
+    <div class="block reveal">
+      <div class="bh"><div class="bicon">🏹</div><div><div class="btitle">Kyūdō no Michi</div><div class="bjp">弓道の道 · El camino del arquero</div></div><div class="btime">2–3 rondas · 15 min</div></div>
+      <ul class="exl">
+        <li class="exi"><span class="eg">剣</span><div class="eb"><div class="en">Tijeras Horizontales</div><div class="enote">Abdominal inferior</div></div><div class="er"><span class="ereps">10 reps</span></div></li>
+        <li class="exi"><span class="eg">剣</span><div class="eb"><div class="en">Elevación de Piernas Rectas y estira</div><div class="enote">Foco en el centro</div></div><div class="er"><span class="ereps">10 reps</span></div></li>
+        <li class="exi"><span class="eg">剣</span><div class="eb"><div class="en">Crunches Bicicleta (Kaze)</div></div><div class="er"><span class="ereps">10 reps</span></div></li>
+        <li class="exi"><span class="eg">剣</span><div class="eb"><div class="en">Abdominales crunch</div></div><div class="er"><span class="ereps">10 reps</span></div></li>
+        <li class="exi"><span class="eg">剣</span><div class="eb"><div class="en">Plancha Fudo Myoo: Inamovible</div></div><div class="er"><span class="ereps">10 seg/lado</span></div></li>
+      </ul>
+    </div>
+    <div class="block reveal">
+      <div class="bh"><div class="bicon">🌊</div><div><div class="btitle">Ciclo de Definición</div><div class="bjp">定義 · 4 series · 8kg</div></div><div class="btime">4×10 · 10 min</div></div>
+      <ul class="exl">
+        <li class="exi"><span class="eg">剣</span><div class="eb"><div class="en">Crunch con peso</div></div><div class="er"><span class="ereps">4×10</span><a class="elink" href="https://www.youtube.com/shorts/9Iwhc_ZMemc" target="_blank">▶ Ver</a></div></li>
+        <li class="exi"><span class="eg">剣</span><div class="eb"><div class="en">Russian Twist pies en suelo</div><div class="enote">Oblicuos en V</div></div><div class="er"><span class="ereps">4×10</span></div></li>
+        <li class="exi"><span class="eg">剣</span><div class="eb"><div class="en">V-Sit Crunch (modificado)</div><div class="enote">Manos atrás, piernas en diagonal. Crunch desde medio hacia delante, abdomen inferior.</div></div><div class="er"><span class="ereps">4×10</span></div></li>
+      </ul>
+    </div>
+    <div class="block reveal">
+      <div class="bh"><div class="bicon">🚴</div><div><div class="btitle">Cardio Yabusame</div><div class="bjp">流鏑馬 · Zona 2 aeróbica</div></div><div class="btime">20–30 min</div></div>
+      <ul class="exl">
+        <li class="exi"><span class="eg">気</span><div class="eb"><div class="en">Bicicleta estática Zona 2</div><div class="enote">Ritmo conversacional sostenido. Quema de grasa máxima.</div></div><div class="er"><span class="ereps">20–30 min</span></div></li>
+      </ul>
+    </div>
+    <div class="block block-full reveal">
+      <div class="bh"><div class="bicon">🧘</div><div><div class="btitle">Zanshin · Finisher</div><div class="bjp">残心 · La conciencia que permanece</div></div><div class="btime">18 min</div></div>
+      <ul class="exl">
+        <li class="exi"><span class="eg">気</span><div class="eb"><div class="en">Movilidad abdominal</div></div><div class="er"><a class="elink" href="https://www.youtube.com/watch?v=m5iRepR7pxY" target="_blank">▶ Ver</a></div></li>
+        <li class="exi"><span class="eg">気</span><div class="eb"><div class="en">Yoga · Quitar mala energía</div></div><div class="er"><a class="elink" href="https://www.youtube.com/watch?v=pUYmbqFWscw" target="_blank">▶ Ver</a></div></li>
+      </ul>
+    </div>
+  </div>
+  <div class="misogi-band">
+    <div class="mc"><div class="mi">❄️</div><div><div class="mn">Misogi Frío · 12–15°C</div><div class="md">Limpieza linfática y activación de grasa parda.</div></div></div>
+    <div class="mc"><div class="mi">🧴</div><div><div class="mn">Ritual Nivea</div><div class="md">Hidratación del rostro tras el contraste frío.</div></div></div>
+  </div>
+</section>
+
+<div class="sec-div"><span class="sec-div-sym">炎</span></div>
+
+<!-- MARTES -->
+<section class="day-sec reveal" id="martes">
+  <div class="day-banner" data-dk="火">
+    <div class="day-num">二</div>
+    <div>
+      <div class="day-jp">火曜日 · Martes</div>
+      <div class="day-el"><span class="dot" style="background:#c45020;box-shadow:0 0 8px #c45020;"></span><span class="el-name" style="color:#c45020;">🔥 Día del Fuego (Ka)</span><span class="el-sub">· Potencia de Piernas · Natural Killer</span></div>
+    </div>
+    <div class="time-badge"><span class="t">40–74</span><span class="tl">minutos</span></div>
+  </div>
+  <div class="day-blocks">
+    <div class="block reveal">
+      <div class="bh"><div class="bicon">🎴</div><div><div class="btitle">Shiko · Calentamiento Sumo</div><div class="bjp">四股 · Cadera y tobillo</div></div><div class="btime">10 min</div></div>
+      <ul class="exl">
+        <li class="exi"><span class="eg">気</span><div class="eb"><div class="en">Posición Shiko</div></div><div class="er"><a class="elink" href="https://www.youtube.com/watch?v=YLvHesbDZUQ" target="_blank">▶ Ver</a></div></li>
+        <li class="exi"><span class="eg">気</span><div class="eb"><div class="en">Flexibilidad de piernas</div></div><div class="er"><a class="elink" href="https://www.youtube.com/watch?v=DOE1Jwfc6jA" target="_blank">▶ Ver</a></div></li>
+        <li class="exi"><span class="eg">気</span><div class="eb"><div class="en">Flexibilidad de piernas 2</div></div><div class="er"><a class="elink" href="https://www.youtube.com/shorts/xMZAL3jf_gE" target="_blank">▶ Ver</a></div></li>
+      </ul>
+    </div>
+    <div class="block reveal">
+      <div class="bh"><div class="bicon">⛩️</div><div><div class="btitle">Raíz de Tori</div><div class="bjp">鳥の根 · 2–3 rondas · última 30kg</div></div><div class="btime">25 min</div></div>
+      <ul class="exl">
+        <li class="exi"><span class="eg">剣</span><div class="eb"><div class="en">Sentadilla Goblet o Sumo</div><div class="enote">Pesa pegada al pecho</div></div><div class="er"><span class="ereps">10–15 reps</span></div></li>
+        <li class="exi"><span class="eg">剣</span><div class="eb"><div class="en">Zancadas Hachiman: Paso firme</div></div><div class="er"><span class="ereps">10–15/pierna</span></div></li>
+        <li class="exi"><span class="eg">剣</span><div class="eb"><div class="en">Hip Thrust Kintsugi</div><div class="enote">Bajada en 5 segundos — 15 a 30 kg</div></div><div class="er"><span class="ereps">15 reps</span></div></li>
+        <li class="exi"><span class="eg">剣</span><div class="eb"><div class="en">Wall Sit (15–30 kg)</div></div><div class="er"><span class="ereps">1 min</span></div></li>
+        <li class="exi"><span class="eg">剣</span><div class="eb"><div class="en">Step-ups en banco (Noboru)</div></div><div class="er"><span class="ereps">15/pierna</span></div></li>
+        <li class="exi"><span class="eg">剣</span><div class="eb"><div class="en">Elevación de Talones</div><div class="enote">Gemelos de acero</div></div><div class="er"><span class="ereps">20 reps</span></div></li>
+      </ul>
+    </div>
+    <div class="block reveal">
+      <div class="bh"><div class="bicon">☯️</div><div><div class="btitle">Opcional · Full-Body</div><div class="bjp">全身 · Fuerza y Movilidad</div></div><div class="btime">17 min</div></div>
+      <ul class="exl">
+        <li class="exi"><span class="eg">気</span><div class="eb"><div class="en">Full-Body Strength & Mobility Workout</div><div class="enote">Entrenamiento completo opcional tras el bloque principal.</div></div><div class="er"><a class="elink" href="https://www.youtube.com/watch?v=OkHN35Bw9gY" target="_blank">▶ Ver</a></div></li>
+      </ul>
+    </div>
+    <div class="block reveal">
+      <div class="bh"><div class="bicon">🧘</div><div><div class="btitle">Shinshin Toisu Do</div><div class="bjp">心身統一道 · Unificación mente-cuerpo</div></div><div class="btime">Finisher</div></div>
+      <ul class="exl">
+        <li class="exi"><span class="eg">気</span><div class="eb"><div class="en">Estirar isquiotibiales</div></div><div class="er"><a class="elink" href="https://www.youtube.com/shorts/eOWTXStUT-o" target="_blank">▶ Ver</a></div></li>
+        <li class="exi"><span class="eg">気</span><div class="eb"><div class="en">Estiramientos flexibilidad</div></div><div class="er"><a class="elink" href="https://www.youtube.com/shorts/vFPkLmlj8Zs" target="_blank">▶ Ver</a></div></li>
+      </ul>
+    </div>
+  </div>
+  <div class="misogi-band">
+    <div class="mc"><div class="mi">♨️</div><div><div class="mn">Misogi Caliente</div><div class="md">Activa señal de crecimiento muscular. Recuperación profunda.</div></div></div>
+    <div class="mc"><div class="mi">💊</div><div><div class="mn">Colágeno · Yōjō 養生</div><div class="md">Suplemento de recuperación articular. Tomar tras el entrenamiento.</div></div></div>
+  </div>
+</section>
+
+<div class="sec-div"><span class="sec-div-sym">水</span></div>
+
+<!-- MIÉRCOLES -->
+<section class="day-sec reveal" id="miercoles">
+  <div class="day-banner" data-dk="水">
+    <div class="day-num">三</div>
+    <div>
+      <div class="day-jp">水曜日 · Miércoles</div>
+      <div class="day-el"><span class="dot" style="background:#2a6fa5;box-shadow:0 0 8px #2a6fa5;"></span><span class="el-name" style="color:#5a9fd4;">🌊 Día del Agua (Sui)</span><span class="el-sub">· Tracción y Espalda · Electrolitos</span></div>
+    </div>
+    <div class="time-badge"><span class="t">40–74</span><span class="tl">minutos</span></div>
+  </div>
+  <div class="day-blocks">
+    <div class="block reveal">
+      <div class="bh"><div class="bicon">🏮</div><div><div class="btitle">Junbi Taiso</div><div class="bjp">準備体操 · Movilidad articular completa</div></div><div class="btime">10 min</div></div>
+      <ul class="exl">
+        <li class="exi"><span class="eg">気</span><div class="eb"><div class="en">Movilidad articular completa</div></div><div class="er"><a class="elink" href="https://www.youtube.com/watch?v=sytmEGA0HKU" target="_blank">▶ Ver</a></div></li>
+        <li class="exi"><span class="eg">気</span><div class="eb"><div class="en">Estiramiento corporal Jiu Jitsu</div></div><div class="er"><a class="elink" href="https://www.youtube.com/watch?v=eCbl7HnDZmQ" target="_blank">▶ Ver</a></div></li>
+      </ul>
+    </div>
+    <div class="block reveal">
+      <div class="bh"><div class="bicon">🥋</div><div><div class="btitle">Makiwara</div><div class="bjp">巻藁 · Forja ósea · Shuto</div></div><div class="btime">5 min</div></div>
+      <ul class="exl">
+        <li class="exi"><span class="eg">剣</span><div class="eb"><div class="en">20 golpes suaves de canto (Shuto)</div><div class="enote">手刀 — por mano. Golpe de canto de la palma.</div></div><div class="er"><span class="ereps">20/mano</span></div></li>
+      </ul>
+    </div>
+    <div class="block reveal">
+      <div class="bh"><div class="bicon">⚔️</div><div><div class="btitle">El Arte de las Dos Katanas</div><div class="bjp">二刀流 · Bajadas lentas 5 segundos</div></div><div class="btime">2–3 rondas · 20 min</div></div>
+      <ul class="exl">
+        <li class="exi"><span class="eg">剣</span><div class="eb"><div class="en">Muscle Up (con goma / última sin goma)</div><div class="enote">Explosividad máxima.</div></div><div class="er"><span class="ereps">5–8 reps</span><a class="elink" href="https://www.youtube.com/shorts/RC2ER-JCifI" target="_blank">▶ Ver</a></div></li>
+        <li class="exi"><span class="eg">剣</span><div class="eb"><div class="en">Ice Cream Makers</div><div class="enote">Control de core en suspensión.</div></div><div class="er"><span class="ereps">6–8 reps</span></div></li>
+        <li class="exi"><span class="eg">剣</span><div class="eb"><div class="en">Remo Australiano en paralelas (Kura)</div><div class="enote">Foco en amplitud de espalda.</div></div><div class="er"><span class="ereps">10–12 reps</span></div></li>
+        <li class="exi"><span class="eg">剣</span><div class="eb"><div class="en">Flexiones Diamante (Hoyo Undo)</div><div class="enote">Recordatorio de tríceps. Mantener la técnica.</div></div><div class="er"><span class="ereps">12–15 reps</span></div></li>
+        <li class="exi"><span class="eg">剣</span><div class="eb"><div class="en">Remo invertido en Paralela</div><div class="enote">Sube explosivo, baja lento. Debajo de mesa o barra de paralelas.</div></div><div class="er"><span class="ereps">12–15 reps</span></div></li>
+        <li class="exi"><span class="eg">剣</span><div class="eb"><div class="en">Pelican Curl en paralelas</div><div class="enote">Pies en el suelo, cuerpo estirado. Bajando y subiendo lento.</div></div><div class="er"><span class="ereps">5–8 reps</span></div></li>
+      </ul>
+    </div>
+    <div class="block reveal">
+      <div class="bh"><div class="bicon">🌊</div><div><div class="btitle">Ciclo de Definición Core</div><div class="bjp">核心 · 4 series · 8kg</div></div><div class="btime">4×10 · 10 min</div></div>
+      <ul class="exl">
+        <li class="exi"><span class="eg">剣</span><div class="eb"><div class="en">Crunch con peso</div></div><div class="er"><span class="ereps">4×10</span><a class="elink" href="https://www.youtube.com/shorts/9Iwhc_ZMemc" target="_blank">▶ Ver</a></div></li>
+        <li class="exi"><span class="eg">剣</span><div class="eb"><div class="en">V-Sit Crunch (modificado)</div><div class="enote">Manos atrás, piernas en diagonal. Crunch desde medio hacia delante, abdomen inferior.</div></div><div class="er"><span class="ereps">4×10</span></div></li>
+      </ul>
+    </div>
+    <div class="block block-full reveal">
+      <div class="bh"><div class="bicon">🧘</div><div><div class="btitle">Zanshin · Finisher</div><div class="bjp">残心 · La conciencia que permanece</div></div><div class="btime">Finisher</div></div>
+      <ul class="exl">
+        <li class="exi"><span class="eg">気</span><div class="eb"><div class="en">Farmer Carry medio — agarre colgando de un brazo (15kg)</div><div class="enote">Aumenta el bombeo y la congestión. Ayuda al crecimiento muscular.</div></div><div class="er"><span class="ereps">2×60 seg</span></div></li>
+        <li class="exi"><span class="eg">気</span><div class="eb"><div class="en">Yoga para columna</div></div><div class="er"><span class="ereps">10 min</span><a class="elink" href="https://www.youtube.com/watch?v=JEAj205exfA" target="_blank">▶ Ver</a></div></li>
+        <li class="exi"><span class="eg">気</span><div class="eb"><div class="en">Movilidad todo el cuerpo</div></div><div class="er"><span class="ereps">30 min</span><a class="elink" href="https://www.youtube.com/watch?v=iLJ_E1D90is" target="_blank">▶ Ver</a></div></li>
+      </ul>
+    </div>
+  </div>
+  <div class="misogi-band">
+    <div class="mc"><div class="mi">♨️</div><div><div class="mn">Misogi Caliente · 37–40°C</div><div class="md">Reparación muscular profunda. Señal de crecimiento.</div></div></div>
+    <div class="mc"><div class="mi">🧂</div><div><div class="mn">Agua + Sal · Electrolitos</div><div class="md">Reposición mineral esencial tras la sesión de tracción.</div></div></div>
+  </div>
+</section>
+
+<div class="sec-div"><span class="sec-div-sym">木</span></div>
+
+<!-- JUEVES -->
+<section class="day-sec reveal" id="jueves">
+  <div class="day-banner" data-dk="木">
+    <div class="day-num">四</div>
+    <div>
+      <div class="day-jp">木曜日 · Jueves</div>
+      <div class="day-el"><span class="dot" style="background:#3a6e3e;box-shadow:0 0 8px #3a6e3e;"></span><span class="el-name" style="color:#5a9e5e;">🌳 Día de la Madera (Moku)</span><span class="el-sub">· Cadena Posterior · Mioquinas</span></div>
+    </div>
+    <div class="time-badge"><span class="t">40</span><span class="tl">minutos</span></div>
+  </div>
+  <div class="day-blocks">
+    <div class="block reveal">
+      <div class="bh"><div class="bicon">🌬️</div><div><div class="btitle">Flujo de Qi</div><div class="bjp">気の流れ · Activación energía vital</div></div><div class="btime">10 min</div></div>
+      <ul class="exl">
+        <li class="exi"><span class="eg">気</span><div class="eb"><div class="en">Flexibilidad Kung-Fu</div></div><div class="er"><a class="elink" href="https://www.youtube.com/watch?v=ODK24MkekCc" target="_blank">▶ Ver</a></div></li>
+        <li class="exi"><span class="eg">気</span><div class="eb"><div class="en">Estiramientos piernas y abdomen</div></div><div class="er"><a class="elink" href="https://www.youtube.com/shorts/2oAl_zWf_Ak" target="_blank">▶ Ver</a></div></li>
+        <li class="exi"><span class="eg">気</span><div class="eb"><div class="en">Movilidad de tobillos y cadera</div><div class="enote">Trabajo libre de movilidad articular sin guía.</div></div></div></li>
+      </ul>
+    </div>
+    <div class="block reveal">
+      <div class="bh"><div class="bicon">🥋</div><div><div class="btitle">Makiwara · Seiken</div><div class="bjp">正拳 · Golpe frontal estable</div></div><div class="btime">5 min</div></div>
+      <ul class="exl">
+        <li class="exi"><span class="eg">剣</span><div class="eb"><div class="en">Golpe frontal estable "Seiken"</div><div class="enote">正拳 — Puño cerrado frontal. Impacto con nudillos índice y corazón.</div></div></div></li>
+      </ul>
+    </div>
+    <div class="block block-full reveal">
+      <div class="bh"><div class="bicon">🐉</div><div><div class="btitle">Ryūkyaku · Movilidad Cuerpo Completo</div><div class="bjp">龍脚 · Práctica completa con cuerpo entero</div></div><div class="btime">1 ronda · 35 min</div></div>
+      <ul class="exl">
+        <li class="exi"><span class="eg">気</span><div class="eb"><div class="en">VIDEO RYŪKYAKU — Práctica completa de movilidad y cadena posterior</div><div class="enote">Sesión guiada completa. Ejecutar con atención plena y respiración controlada.</div></div><div class="er"><span class="ereps">35 min</span></div></li>
+      </ul>
+    </div>
+    <div class="block block-full reveal">
+      <div class="bh"><div class="bicon">🥷</div><div><div class="btitle">Fuerza del Shinobi</div><div class="bjp">忍者の力 · 2 rondas</div></div><div class="btime">2 rondas · 5 min</div></div>
+      <ul class="exl">
+        <li class="exi"><span class="eg">剣</span><div class="eb"><div class="en">Sentadilla Sumo</div></div><div class="er"><span class="ereps">10–15 reps</span></div></li>
+        <li class="exi"><span class="eg">剣</span><div class="eb"><div class="en">Zancadas Hachiman: Paso firme</div></div><div class="er"><span class="ereps">10–15/pierna</span></div></li>
+        <li class="exi"><span class="eg">剣</span><div class="eb"><div class="en">Hip Thrust Kintsugi</div><div class="enote">Bajada en 5 segundos — 15 a 30 kg</div></div><div class="er"><span class="ereps">20 reps</span></div></li>
+        <li class="exi"><span class="eg">剣</span><div class="eb"><div class="en">Wall Sit (15–30 kg)</div></div><div class="er"><span class="ereps">1 min</span></div></li>
+        <li class="exi"><span class="eg">剣</span><div class="eb"><div class="en">Step-ups en banco (Noboru)</div></div><div class="er"><span class="ereps">15/pierna</span></div></li>
+        <li class="exi"><span class="eg">剣</span><div class="eb"><div class="en">Elevación de Talones (Gemelos de acero)</div></div><div class="er"><span class="ereps">20 reps</span></div></li>
+      </ul>
+    </div>
+    <div class="block block-full reveal">
+      <div class="bh"><div class="bicon">🧘</div><div><div class="btitle">Shinshin Toisu Do</div><div class="bjp">心身統一道 · Unificación mente-cuerpo</div></div><div class="btime">5 min</div></div>
+      <ul class="exl">
+        <li class="exi"><span class="eg">気</span><div class="eb"><div class="en">Limpieza del cuerpo — eliminar el estrés</div></div><div class="er"><a class="elink" href="https://www.youtube.com/watch?v=uJpY3WPqxNo" target="_blank">▶ Ver</a></div></li>
+        <li class="exi"><span class="eg">気</span><div class="eb"><div class="en">Estirar isquiotibiales</div></div><div class="er"><a class="elink" href="https://www.youtube.com/shorts/eOWTXStUT-o" target="_blank">▶ Ver</a></div></li>
+        <li class="exi"><span class="eg">気</span><div class="eb"><div class="en">Estiramientos flexibilidad</div></div><div class="er"><a class="elink" href="https://www.youtube.com/shorts/vFPkLmlj8Zs" target="_blank">▶ Ver</a></div></li>
+      </ul>
+    </div>
+  </div>
+  <div class="misogi-band">
+    <div class="mc"><div class="mi">❄️</div><div><div class="mn">Misogi Frío · 12–15°C</div><div class="md">Limpieza linfática y activación de grasa parda.</div></div></div>
+    <div class="mc"><div class="mi">🧴</div><div><div class="mn">Ritual Nivea</div><div class="md">Hidratación del rostro tras el contraste frío.</div></div></div>
+  </div>
+</section>
+
+<div class="sec-div"><span class="sec-div-sym">金</span></div>
+
+<!-- VIERNES -->
+<section class="day-sec reveal" id="viernes">
+  <div class="day-banner" data-dk="金">
+    <div class="day-num">五</div>
+    <div>
+      <div class="day-jp">金曜日 · Viernes</div>
+      <div class="day-el"><span class="dot" style="background:#b09020;box-shadow:0 0 8px #b09020;"></span><span class="el-name" style="color:#d4b840;">⚙️ Día del Metal (Kin)</span><span class="el-sub">· Empuje y Armadura · Hombros de Kabuto</span></div>
+    </div>
+    <div class="time-badge"><span class="t">40</span><span class="tl">minutos</span></div>
+  </div>
+  <div class="day-blocks">
+    <div class="block reveal">
+      <div class="bh"><div class="bicon">🤜</div><div><div class="btitle">Tetsu no Ken · Puños de Acero</div><div class="bjp">鉄の拳 · Preparación manos y brazos</div></div><div class="btime">15 min</div></div>
+      <ul class="exl">
+        <li class="exi"><span class="eg">気</span><div class="eb"><div class="en">Estiramiento de puños</div></div><div class="er"><a class="elink" href="https://www.youtube.com/shorts/V1e43TtUdWI" target="_blank">▶ Ver</a></div></li>
+        <li class="exi"><span class="eg">気</span><div class="eb"><div class="en">Estiramiento túnel Carpiano</div></div><div class="er"><a class="elink" href="https://www.youtube.com/shorts/VSkWvTU4Wlo" target="_blank">▶ Ver</a></div></li>
+        <li class="exi"><span class="eg">気</span><div class="eb"><div class="en">Estiramiento antes de fuerza de brazo</div></div><div class="er"><a class="elink" href="https://www.youtube.com/watch?v=sufB-jhNOfI" target="_blank">▶ Ver</a></div></li>
+        <li class="exi"><span class="eg">気</span><div class="eb"><div class="en">Movilidad corporal</div></div><div class="er"><a class="elink" href="https://www.youtube.com/watch?v=9vQgZB_BnNQ" target="_blank">▶ Ver</a></div></li>
+      </ul>
+    </div>
+    <div class="block reveal">
+      <div class="bh"><div class="bicon">👺</div><div><div class="btitle">Fuerza de Onryō</div><div class="bjp">怨霊の力 · 2–3 rondas · Descanso 2 min</div></div><div class="btime">20 min</div></div>
+      <ul class="exl">
+        <li class="exi"><span class="eg">剣</span><div class="eb"><div class="en">Fondos profundos en paralelas (Dips)</div><div class="enote">Potencia de pecho y tríceps.</div></div><div class="er"><span class="ereps">8–12 reps</span></div></li>
+        <li class="exi"><span class="eg">剣</span><div class="eb"><div class="en">Flexiones arqueras en paralelas</div><div class="enote">Fuerza unilateral de empuje.</div></div><div class="er"><span class="ereps">8/lado</span></div></li>
+        <li class="exi"><span class="eg">剣</span><div class="eb"><div class="en">Flexiones "3 tipos"</div></div><div class="er"><span class="ereps">6/tipo</span><a class="elink" href="https://www.youtube.com/shorts/tmlyzzA8Xdw" target="_blank">▶ Ver</a></div></li>
+        <li class="exi"><span class="eg">剣</span><div class="eb"><div class="en">Pike Push-ups (en paralelas)</div><div class="enote">Hombro puro — empuje vertical.</div></div><div class="er"><span class="ereps">8–10 reps</span></div></li>
+        <li class="exi"><span class="eg">剣</span><div class="eb"><div class="en">Twisting Hanging Leg Raise</div><div class="enote">Core lateral en suspensión.</div></div><div class="er"><span class="ereps">5/lado</span></div></li>
+        <li class="exi"><span class="eg">剣</span><div class="eb"><div class="en">Remo prono con cinta en los pies</div><div class="enote">Solo técnica, no fatiga. Recordatorio ligero.</div></div><div class="er"><span class="ereps">10 lento</span></div></li>
+      </ul>
+    </div>
+    <div class="block block-full reveal">
+      <div class="bh"><div class="bicon">🧘</div><div><div class="btitle">Zanshin · Finisher</div><div class="bjp">残心 · Cierre del guerrero</div></div><div class="btime">5 min</div></div>
+      <ul class="exl">
+        <li class="exi"><span class="eg">気</span><div class="eb"><div class="en">Farmer Carry medio — agarre colgando de un brazo (15kg)</div><div class="enote">Aumenta el bombeo y la congestión. Ayuda al crecimiento muscular.</div></div><div class="er"><span class="ereps">2×60 seg</span></div></li>
+        <li class="exi"><span class="eg">気</span><div class="eb"><div class="en">Combat Mobility Workout</div></div><div class="er"><a class="elink" href="https://www.youtube.com/watch?v=d9s8iXNYFSk" target="_blank">▶ Ver</a></div></li>
+        <li class="exi"><span class="eg">気</span><div class="eb"><div class="en">POST-WORKOUT DECOMPRESSION FLOW</div></div><div class="er"><a class="elink" href="https://www.youtube.com/watch?v=nEOlDVNKR04" target="_blank">▶ Ver</a></div></li>
+        <li class="exi"><span class="eg">気</span><div class="eb"><div class="en">Masaje de cuello</div></div><div class="er"><a class="elink" href="https://www.youtube.com/shorts/l8LyKFi2G6o" target="_blank">▶ Ver</a></div></li>
+      </ul>
+    </div>
+  </div>
+  <div class="misogi-band">
+    <div class="mc"><div class="mi">♨️</div><div><div class="mn">Misogi Caliente</div><div class="md">Cierre de la semana de metal. Recuperación total.</div></div></div>
+    <div class="mc"><div class="mi">🥋</div><div><div class="mn">Cierre Semanal</div><div class="md">La semana del guerrero concluye. El descanso también es entrenamiento.</div></div></div>
+  </div>
+</section>
+
+<div class="sec-div"><span class="sec-div-sym">山</span></div>
+
+<!-- FIN DE SEMANA -->
+<section class="day-sec reveal" id="finde">
+  <div class="day-banner" data-dk="山" style="background:linear-gradient(90deg,rgba(44,62,107,0.15) 0%,transparent 60%);">
+    <div class="day-num">六七</div>
+    <div>
+      <div class="day-jp">土·日曜日 · Sábado & Domingo</div>
+      <div class="day-el"><span class="dot" style="background:#4a6fa5;box-shadow:0 0 8px #4a6fa5;"></span><span class="el-name" style="color:#6b9fd4;">🏔️ Días de la Montaña (Yama)</span><span class="el-sub">· Shinrin-Yoku · Reset Biológico</span></div>
+    </div>
+    <div class="time-badge"><span class="t">自由</span><span class="tl">libre</span></div>
+  </div>
+  <div class="day-blocks">
+    <div class="block reveal">
+      <div class="bh"><div class="bicon">🌲</div><div><div class="btitle">Shinrin-Yoku</div><div class="bjp">森林浴 · Baño de bosque</div></div><div class="btime">Mañana</div></div>
+      <ul class="exl">
+        <li class="exi"><span class="eg">気</span><div class="eb"><div class="en">10.000 pasos en naturaleza</div><div class="enote">Sin auriculares. Presencia total. Escucha al bosque.</div></div><div class="er"><span class="ereps">10k pasos</span></div></li>
+        <li class="exi"><span class="eg">気</span><div class="eb"><div class="en">Exposición solar · 20 min</div><div class="enote">Vitamina D natural. Cara y brazos expuestos.</div></div><div class="er"><span class="ereps">20 min</span></div></li>
+      </ul>
+    </div>
+    <div class="block reveal">
+      <div class="bh"><div class="bicon">🥋</div><div><div class="btitle">Dojo Tamashi Kokoro</div><div class="bjp">魂·心 · Fitness HIIT Aikido</div></div><div class="btime">Arte de la Paz</div></div>
+      <ul class="exl">
+        <li class="exi"><span class="eg">剣</span><div class="eb"><div class="en">Fitness HIIT Aikido — Arte de la Paz vol. 1</div></div><div class="er"><a class="elink" href="https://www.youtube.com/watch?v=4TaJ_G7-YL8" target="_blank">▶ Ver</a></div></li>
+        <li class="exi"><span class="eg">剣</span><div class="eb"><div class="en">Fitness HIIT Aikido — Arte de la Paz vol. 2</div></div><div class="er"><a class="elink" href="https://www.youtube.com/watch?v=0eQG_xHD_a4" target="_blank">▶ Ver</a></div></li>
+        <li class="exi"><span class="eg">気</span><div class="eb"><div class="en">Estiramientos finales</div></div><div class="er"><a class="elink" href="https://www.youtube.com/watch?v=QbmSjyfBgUs" target="_blank">▶ Ver</a></div></li>
+      </ul>
+    </div>
+    <div class="block reveal">
+      <div class="bh"><div class="bicon">💠</div><div><div class="btitle">Sento · Reset Biológico</div><div class="bjp">銭湯 · Una vez al mes</div></div><div class="btime">Mensual</div></div>
+      <ul class="exl">
+        <li class="exi"><span class="eg">気</span><div class="eb"><div class="en">Sauna</div><div class="enote">80–100°C. Estimula hormona del crecimiento.</div></div></li>
+        <li class="exi"><span class="eg">気</span><div class="eb"><div class="en">Inmersión en frío</div><div class="enote">Contraste total. Activación del sistema nervioso.</div></div></li>
+        <li class="exi"><span class="eg">気</span><div class="eb"><div class="en">Reposo absoluto</div><div class="enote">Sin pantallas. Integración del reset biológico.</div></div></li>
+      </ul>
+    </div>
+  </div>
+  <div class="misogi-band">
+    <div class="mc"><div class="mi">♨️</div><div><div class="mn">Misogi Caliente</div><div class="md">Cierre del ciclo semanal. Preparación para el lunes.</div></div></div>
+    <div class="mc"><div class="mi">🌸</div><div><div class="mn">Musubi · Conexión</div><div class="md">El descanso del guerrero no es pasivo. Es acumulación silenciosa.</div></div></div>
+  </div>
+</section>
+
+<div class="sec-div"><span class="sec-div-sym">気</span></div>
+
+<!-- RESPIRACIÓN -->
+<section id="respiracion">
+  <div class="sec-title reveal">
+    <span class="big-k">呼吸</span>
+    <h2>Respiración Diaria</h2>
+    <p>息の道 · 5 minutos · El aliento del guerrero</p>
+  </div>
+  <style>
+    #respiracion{padding-bottom:4rem;}
+    .wh-wrap{max-width:600px;margin:0 auto;padding:0 1.5rem;}
+    .wh-circle-wrap{display:flex;justify-content:center;margin:2rem 0 0.5rem;position:relative;}
+    .wh-outer{width:220px;height:220px;position:relative;display:flex;align-items:center;justify-content:center;}
+    .wh-ring1{position:absolute;inset:0;border-radius:50%;border:1px solid rgba(139,26,26,0.25);}
+    .wh-ring2{position:absolute;inset:14px;border-radius:50%;border:1px solid rgba(139,26,26,0.12);}
+    .wh-ring3{position:absolute;inset:28px;border-radius:50%;border:1px solid rgba(201,154,32,0.07);}
+    .wh-core{width:120px;height:120px;border-radius:50%;border:2px solid var(--red2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.1rem;box-shadow:0 0 28px rgba(139,26,26,0.28),inset 0 0 18px rgba(139,26,26,0.07);transition:transform 0.05s linear,box-shadow 0.5s;z-index:1;cursor:pointer;}
+    .wh-core.ph-in{animation:whIn var(--wh-in,1.6s) ease-in-out infinite alternate;}
+    .wh-core.ph-out{animation:whOut var(--wh-out,1.6s) ease-in-out infinite alternate;}
+    .wh-core.ph-hold-full{transform:scale(1.45);box-shadow:0 0 60px rgba(224,48,16,0.55),inset 0 0 38px rgba(139,26,26,0.2);}
+    .wh-core.ph-hold-empty{transform:scale(0.76);box-shadow:0 0 8px rgba(139,26,26,0.1);}
+    @keyframes whIn{from{transform:scale(0.88);box-shadow:0 0 12px rgba(139,26,26,0.18);}to{transform:scale(1.45);box-shadow:0 0 55px rgba(224,48,16,0.5),inset 0 0 32px rgba(139,26,26,0.18);}}
+    @keyframes whOut{from{transform:scale(1.45);box-shadow:0 0 50px rgba(224,48,16,0.45);}to{transform:scale(0.76);box-shadow:0 0 6px rgba(139,26,26,0.08);}}
+    .wh-kanji{font-family:"Zen Antique Soft",serif;font-size:2rem;color:var(--red2);line-height:1;}
+    .wh-core-lbl{font-size:0.48rem;letter-spacing:0.2em;color:var(--fog);text-transform:uppercase;margin-top:0.05rem;}
+    .wh-badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--black);border:1px solid rgba(201,154,32,0.4);padding:0.12rem 0.65rem;font-family:"Zen Antique Soft",serif;font-size:0.7rem;color:var(--gold);letter-spacing:0.15em;white-space:nowrap;display:none;}
+    .wh-breath-big{font-family:"Zen Antique Soft",serif;font-size:3.5rem;color:var(--red2);text-align:center;min-height:4rem;line-height:1;text-shadow:0 0 25px rgba(224,48,16,0.4);transition:transform 0.08s,color 0.08s;}
+    .wh-breath-big.beat{transform:scale(1.18);color:var(--red-glow);}
+    .wh-status{font-size:0.72rem;letter-spacing:0.14em;color:var(--white2);text-align:center;min-height:1.3rem;margin:0.4rem 0 0.15rem;}
+    .wh-sub{font-size:0.62rem;color:var(--mist);text-align:center;min-height:1.1rem;font-style:italic;margin-bottom:1.2rem;}
+    .wh-info{display:flex;justify-content:center;gap:2.5rem;margin:0.8rem 0 1.2rem;}
+    .wh-iv{text-align:center;}
+    .wh-iv span:first-child{font-family:"Zen Antique Soft",serif;font-size:1.6rem;color:var(--white);display:block;line-height:1;}
+    .wh-iv span:last-child{font-size:0.53rem;letter-spacing:0.18em;color:var(--fog);text-transform:uppercase;display:block;margin-top:0.1rem;}
+    .wh-phases{display:flex;gap:1px;background:rgba(139,26,26,0.1);border:1px solid rgba(139,26,26,0.15);}
+    .wh-ph{flex:1;padding:0.7rem 0.4rem;text-align:center;transition:background 0.4s;}
+    .wh-ph.on{background:rgba(139,26,26,0.22);}
+    .wh-ph .phi{font-size:1rem;display:block;margin-bottom:0.2rem;}
+    .wh-ph .phn{font-size:0.56rem;letter-spacing:0.1em;color:var(--fog);text-transform:uppercase;display:block;}
+    .wh-ph.on .phn{color:var(--red2);}
+    .wh-rounds{display:flex;gap:0.35rem;justify-content:center;flex-wrap:wrap;margin:1.3rem 0 0;}
+    .wh-dot{width:30px;height:30px;border-radius:50%;border:1px solid rgba(139,26,26,0.3);display:flex;align-items:center;justify-content:center;font-family:"Zen Antique Soft",serif;font-size:0.62rem;color:var(--fog);transition:all 0.4s;}
+    .wh-dot.done{border-color:var(--gold);color:var(--gold);box-shadow:0 0 8px rgba(201,154,32,0.3);}
+    .wh-dot.cur{border-color:var(--red2);color:var(--red2);animation:dotpulse 1s infinite;}
+    @keyframes dotpulse{0%,100%{box-shadow:0 0 6px rgba(224,48,16,0.3);}50%{box-shadow:0 0 16px rgba(224,48,16,0.7);}}
+    .wh-btn{display:block;margin:1.5rem auto 0;background:transparent;border:1px solid var(--red2);color:var(--white);font-family:"Shippori Mincho B1",serif;font-size:0.7rem;letter-spacing:0.3em;text-transform:uppercase;padding:0.75rem 2.5rem;cursor:pointer;transition:all 0.3s;overflow:hidden;position:relative;}
+    .wh-btn::after{content:"";position:absolute;inset:0;background:var(--red2);transform:scaleX(0);transform-origin:left;transition:transform 0.3s;z-index:-1;}
+    .wh-btn:hover::after{transform:scaleX(1);}
+    .wh-btn:disabled{opacity:0.3;cursor:default;}
+    .wh-timetotal{font-size:0.6rem;letter-spacing:0.2em;color:var(--fog);text-align:center;margin-top:0.8rem;}
+  </style>
+
+  <div class="wh-wrap reveal">
+    <div class="wh-rounds" id="whRounds"></div>
+    <div class="wh-circle-wrap">
+      <div class="wh-outer">
+        <div class="wh-ring1"></div><div class="wh-ring2"></div><div class="wh-ring3"></div>
+        <div class="wh-core" id="whCore" onclick="whToggle()">
+          <span class="wh-kanji" id="whKanji">呼吸</span>
+          <span class="wh-core-lbl" id="whCL">iniciar</span>
+        </div>
+        <div class="wh-badge" id="whBadge"></div>
+      </div>
+    </div>
+    <div class="wh-breath-big" id="whBN"></div>
+    <div class="wh-status" id="whSt">Protocolo Wim Hof · 3 rondas · 5 minutos</div>
+    <div class="wh-sub" id="whSub">Siéntate cómodo. Activa el volumen del dispositivo.</div>
+    <div class="wh-info">
+      <div class="wh-iv"><span id="whR">–</span><span>Ronda</span></div>
+      <div class="wh-iv"><span id="whTT">5:00</span><span>Tiempo</span></div>
+      <div class="wh-iv"><span id="whPT">–</span><span>Fase</span></div>
+    </div>
+    <div class="wh-phases">
+      <div class="wh-ph" id="phB"><span class="phi">💨</span><span class="phn">30 Respir.</span></div>
+      <div class="wh-ph" id="phH"><span class="phi">🫁</span><span class="phn">Retención</span></div>
+      <div class="wh-ph" id="phR"><span class="phi">⬆️</span><span class="phn">Recuperac.</span></div>
+    </div>
+    <button class="wh-btn" id="whBtn" onclick="whToggle()">始める · Iniciar</button>
+    <div class="wh-timetotal" id="whTL"></div>
+  </div>
+  <div class="bwim reveal" style="margin-top:2rem;text-align:center;">Referencia original — <a href="https://www.youtube.com/watch?v=hqJZR4d80Do&t=297s" target="_blank">Wim Hof breathing ▶</a></div>
+</section>
+
+<div class="sec-div"><span class="sec-div-sym">薬</span></div>
+
+<!-- BIOHACKING -->
+<section id="biohacking">
+  <div class="sec-title reveal">
+    <span class="big-k">薬</span>
+    <h2>Biohacking Final</h2>
+    <p>生物学的最適化 · Optimización biológica del guerrero</p>
+  </div>
+  <div class="bio-grid">
+    <div class="bio-item reveal"><span class="bioi">🍵</span><span class="bion">Té Matcha</span><span class="biod">1–2 tazas diarias. Antioxidantes, L-teanina, foco.</span></div>
+    <div class="bio-item reveal"><span class="bioi">💊</span><span class="bion">Colágeno</span><span class="biod">Yōjō 養生 — tras piernas. Articulaciones y recuperación.</span></div>
+    <div class="bio-item reveal"><span class="bioi">🧂</span><span class="bion">Magnesio</span><span class="biod">En baño de pies caliente antes de dormir. Ashiyu.</span></div>
+    <div class="bio-item reveal"><span class="bioi">❄️</span><span class="bion">Misogi Frío</span><span class="biod">12–15°C. Linfático, grasa parda, sistema nervioso.</span></div>
+    <div class="bio-item reveal"><span class="bioi">♨️</span><span class="bion">Misogi Caliente</span><span class="biod">37–40°C. Reparación muscular, señal de crecimiento.</span></div>
+    <div class="bio-item reveal"><span class="bioi">☀️</span><span class="bion">Sol Diario</span><span class="biod">20 min de exposición. Vitamina D, serotonina, ritmo circadiano.</span></div>
+    <div class="bio-item reveal"><span class="bioi">💠</span><span class="bion">Sento Mensual</span><span class="biod">Sauna → Frío → Reposo. Reset biológico total.</span></div>
+    <div class="bio-item reveal"><span class="bioi">🧴</span><span class="bion">Ritual Nivea</span><span class="biod">Hidratación del rostro tras el Misogi frío. Cuidado del templo.</span></div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <span class="fk">武士道</span>
+  <p>武士道生物学 · Protocolo Bushidō Biológico · Longevidad y Acero</p>
+  <p>心 · 体 · 剣 · 道 · 気</p>
+</footer>
+
+<script>
+/* CANVAS EMBERS */
+const cv=document.getElementById('canvas'),cx=cv.getContext('2d');
+let W,H;
+function rsz(){W=cv.width=window.innerWidth;H=cv.height=window.innerHeight;}
+rsz();window.addEventListener('resize',rsz);
+
+class Ember{
+  constructor(init){
+    this.x=Math.random()*W;
+    this.y=init?Math.random()*H:H+10;
+    this.sz=Math.random()*1.8+0.3;
+    this.vy=-(Math.random()*0.5+0.15);
+    this.vx=(Math.random()-0.5)*0.3;
+    this.life=init?Math.random():0;
+    this.ml=Math.random()*0.5+0.5;
+    this.dec=Math.random()*0.002+0.0005;
+    this.t=Math.random();
+    this.w=Math.random()*Math.PI*2;
+    this.ws=Math.random()*0.02+0.005;
+  }
+  tick(){
+    this.y+=this.vy; this.w+=this.ws;
+    this.x+=this.vx+Math.sin(this.w)*0.35;
+    this.life+=this.dec;
+    const p=this.life/this.ml;
+    this.a=p<0.15?p/0.15:p>0.8?1-(p-0.8)/0.2:1;
+    if(this.life>=this.ml||this.y<-10){Object.assign(this,new Ember(false));}
+  }
+  draw(){
+    cx.save();cx.globalAlpha=this.a*0.75;
+    if(this.t<0.25){cx.fillStyle=`rgb(215,${Math.floor(50+this.a*40)},10)`;cx.shadowColor='#bb2800';cx.shadowBlur=8;}
+    else if(this.t<0.5){cx.fillStyle=`rgb(${Math.floor(170+this.a*40)},${Math.floor(120+this.a*30)},15)`;cx.shadowColor='#b08010';cx.shadowBlur=5;}
+    else{cx.fillStyle=`rgba(110,90,80,${this.a*0.35})`;cx.shadowBlur=0;}
+    cx.beginPath();cx.arc(this.x,this.y,this.sz,0,Math.PI*2);cx.fill();cx.restore();
+  }
+}
+
+const embers=[];
+for(let i=0;i<180;i++)embers.push(new Ember(true));
+
+class Streak{
+  constructor(){this.active=false;this.next=Math.random()*300+100;this.life=0;this.maxLife=0;}
+  tick(){
+    this.next--;
+    if(this.next<=0&&!this.active){
+      this.active=true;this.x=Math.random()*W;this.y=H+5;
+      this.vy=-(Math.random()*3+2);this.vx=(Math.random()-0.5)*0.5;
+      this.life=0;this.maxLife=Math.floor(40+Math.random()*20);
+    }
+    if(!this.active)return;
+    this.y+=this.vy;this.x+=this.vx;this.life++;
+    if(this.life>=this.maxLife){this.active=false;this.next=Math.random()*400+150;}
+  }
+  draw(){
+    if(!this.active)return;
+    const a=Math.min(1,(this.maxLife-this.life)/12)*0.55;
+    cx.save();cx.globalAlpha=a;cx.strokeStyle='#c03800';cx.shadowColor='#ff2800';cx.shadowBlur=6;cx.lineWidth=0.8;
+    cx.beginPath();cx.moveTo(this.x,this.y);cx.lineTo(this.x-this.vx*20,this.y-this.vy*20);cx.stroke();cx.restore();
+  }
+}
+const streaks=[new Streak(),new Streak(),new Streak()];
+
+(function loop(){
+  cx.clearRect(0,0,W,H);
+  embers.forEach(e=>{e.tick();e.draw();});
+  streaks.forEach(s=>{s.tick();s.draw();});
+  requestAnimationFrame(loop);
+})();
+
+/* SCROLL REVEAL */
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});
+},{threshold:0.07});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+
+/* ═══════════════════════════════════════
+   WIM HOF BREATHING ENGINE
+   Protocolo: 3 rondas × 30 respiraciones + retención + recuperación
+   Duración total: ~5 minutos
+═══════════════════════════════════════ */
+const WH = {
+  // Tiempos (ms)
+  INHALE: 1600,       // 1.6s inhala
+  EXHALE: 1600,       // 1.6s exhala
+  BREATHS: 30,        // respiraciones por ronda
+  ROUNDS: 3,          // rondas
+  HOLD_OUT: 60,       // segundos retención pulmones vacíos (ronda 1-3 escala)
+  HOLD_IN: 15,        // segundos retención llenos (recuperación)
+  TOTAL_SECS: 300,    // 5 minutos
+
+  // Estado
+  running: false,
+  phase: 'idle',      // idle | breathing | hold_out | hold_in | done
+  round: 0,
+  breathIdx: 0,
+  phaseTimer: 0,
+  totalRemain: 300,
+  intervals: [],
+  timeouts: [],
+  audioCtx: null,
+};
+
+// ─── AUDIO ───
+function whAudio() {
+  if (!WH.audioCtx) WH.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return WH.audioCtx;
+}
+
+function playTone(freq, dur, type='sine', vol=0.18) {
+  try {
+    const ac = whAudio();
+    const osc = ac.createOscillator();
+    const gain = ac.createGain();
+    osc.connect(gain); gain.connect(ac.destination);
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, ac.currentTime);
+    gain.gain.setValueAtTime(0, ac.currentTime);
+    gain.gain.linearRampToValueAtTime(vol, ac.currentTime + 0.05);
+    gain.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + dur);
+    osc.start(ac.currentTime);
+    osc.stop(ac.currentTime + dur + 0.05);
+  } catch(e) {}
+}
+
+// Sonido inhalar: tono suave ascendente
+function soundInhale() { playTone(330, 0.35, 'sine', 0.15); }
+// Sonido exhalar: tono grave descendente
+function soundExhale() { playTone(220, 0.35, 'triangle', 0.12); }
+// Sonido inicio retención: gong suave
+function soundHoldStart() {
+  playTone(174, 1.2, 'sine', 0.22);
+  setTimeout(()=>playTone(220, 0.8, 'sine', 0.1), 300);
+}
+// Sonido fin retención: alerta suave triple
+function soundHoldEnd() {
+  [0, 180, 360].forEach(d => setTimeout(()=>playTone(440, 0.25, 'sine', 0.2), d));
+}
+// Sonido recuperación (inhala profundo)
+function soundRecovery() { playTone(528, 1.0, 'sine', 0.2); }
+// Sonido fin ronda
+function soundRoundDone() {
+  [0,200,400].forEach((d,i) => setTimeout(()=>playTone(220+i*110, 0.4, 'sine', 0.18), d));
+}
+// Sonido sesión completada
+function soundDone() {
+  [0,300,600,900].forEach((d,i) => setTimeout(()=>playTone(261+i*130, 0.5, 'sine', 0.2), d));
+}
+
+// ─── HELPERS DOM ───
+const $ = id => document.getElementById(id);
+
+function whSetPhaseUI(phase) {
+  ['phB','phH','phR'].forEach(id => $(id).classList.remove('on'));
+  if (phase === 'breathing') $('phB').classList.add('on');
+  if (phase === 'hold_out')  $('phH').classList.add('on');
+  if (phase === 'hold_in')   $('phR').classList.add('on');
+}
+
+function whSetCore(kanji, label, cssClass) {
+  const c = $('whCore');
+  c.className = 'wh-core ' + cssClass;
+  $('whKanji').textContent = kanji;
+  $('whCL').textContent = label;
+}
+
+function whSetStatus(main, sub) {
+  $('whSt').textContent = main;
+  $('whSub').textContent = sub;
+}
+
+function whUpdateRounds() {
+  const el = $('whRounds');
+  el.innerHTML = '';
+  for (let i = 0; i < WH.ROUNDS; i++) {
+    const d = document.createElement('div');
+    d.className = 'wh-dot' + (i < WH.round ? ' done' : i === WH.round ? ' cur' : '');
+    d.textContent = i + 1;
+    el.appendChild(d);
+  }
+}
+
+function whFmtTime(s) {
+  return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
+}
+
+function whClear() {
+  WH.intervals.forEach(clearInterval);
+  WH.timeouts.forEach(clearTimeout);
+  WH.intervals = []; WH.timeouts = [];
+}
+
+// ─── MAIN TOGGLE ───
+function whToggle() {
+  if (WH.running) { whStop(); return; }
+  // Init AudioContext on user gesture
+  try { whAudio().resume(); } catch(e){}
+  whStart();
+}
+
+function whStop() {
+  whClear();
+  WH.running = false;
+  WH.phase = 'idle';
+  WH.round = 0; WH.breathIdx = 0;
+  WH.totalRemain = WH.TOTAL_SECS;
+  whSetCore('呼吸', 'iniciar', '');
+  whSetStatus('Protocolo Wim Hof · 3 rondas · 5 minutos', 'Sesión interrumpida. Toca para reiniciar.');
+  whSetPhaseUI('idle');
+  $('whBtn').textContent = '始める · Iniciar';
+  $('whBN').textContent = '';
+  $('whR').textContent = '–';
+  $('whPT').textContent = '–';
+  $('whRounds').innerHTML = '';
+  $('whTL').textContent = '';
+}
+
+function whStart() {
+  WH.running = true;
+  WH.round = 0;
+  WH.totalRemain = WH.TOTAL_SECS;
+  $('whBtn').textContent = '止める · Detener';
+  whUpdateRounds();
+
+  // Total countdown
+  const totalInt = setInterval(() => {
+    WH.totalRemain--;
+    $('whTT').textContent = whFmtTime(WH.totalRemain);
+    if (WH.totalRemain <= 0) clearInterval(totalInt);
+  }, 1000);
+  WH.intervals.push(totalInt);
+
+  whStartRound();
+}
+
+function whStartRound() {
+  if (!WH.running) return;
+  if (WH.round >= WH.ROUNDS) { whComplete(); return; }
+  WH.breathIdx = 0;
+  WH.phase = 'breathing';
+  whUpdateRounds();
+  $('whR').textContent = (WH.round+1) + '/' + WH.ROUNDS;
+  whSetPhaseUI('breathing');
+  whSetStatus('Ronda ' + (WH.round+1) + ' · 30 Respiraciones', 'Inhala y exhala fuerte y rápido por la nariz o boca');
+  whBreathCycle();
+}
+
+function whBreathCycle() {
+  if (!WH.running || WH.phase !== 'breathing') return;
+  if (WH.breathIdx >= WH.BREATHS) {
+    // Fin de respiraciones → retención vacío
+    whStartHoldOut();
+    return;
+  }
+
+  // INHALA
+  WH.breathIdx++;
+  soundInhale();
+  const bn = $('whBN');
+  bn.textContent = WH.breathIdx;
+  bn.classList.add('beat');
+  setTimeout(() => bn.classList.remove('beat'), 150);
+
+  whSetCore('吸', 'inhala', 'ph-in');
+  $('whPT').textContent = WH.breathIdx + '/' + WH.BREATHS;
+  document.documentElement.style.setProperty('--wh-in', WH.INHALE + 'ms');
+  document.documentElement.style.setProperty('--wh-out', WH.EXHALE + 'ms');
+
+  const t1 = setTimeout(() => {
+    if (!WH.running) return;
+    // EXHALA
+    soundExhale();
+    whSetCore('呼', 'exhala', 'ph-out');
+    const t2 = setTimeout(() => whBreathCycle(), WH.EXHALE);
+    WH.timeouts.push(t2);
+  }, WH.INHALE);
+  WH.timeouts.push(t1);
+}
+
+function whStartHoldOut() {
+  if (!WH.running) return;
+  WH.phase = 'hold_out';
+  whSetPhaseUI('hold_out');
+  // Retención escalonada: ronda 1→45s, 2→55s, 3→65s (pero limitado a lo que quede del timer)
+  const holdSecs = [45, 55, 65][WH.round] || 60;
+  let holdCount = holdSecs;
+
+  soundHoldStart();
+  whSetCore('空', 'retención', 'ph-hold-empty');
+  whSetStatus('RETENCIÓN · Pulmones vacíos', 'Aguanta sin respirar — relájate completamente');
+  $('whBN').textContent = '';
+  $('whBadge').style.display = 'block';
+  $('whBadge').textContent = holdSecs + 's';
+
+  const holdInt = setInterval(() => {
+    if (!WH.running) { clearInterval(holdInt); return; }
+    holdCount--;
+    $('whPT').textContent = holdCount + 's';
+    $('whBadge').textContent = holdCount + 's';
+    if (holdCount <= 0) {
+      clearInterval(holdInt);
+      whStartHoldIn();
+    }
+  }, 1000);
+  WH.intervals.push(holdInt);
+}
+
+function whStartHoldIn() {
+  if (!WH.running) return;
+  WH.phase = 'hold_in';
+  whSetPhaseUI('hold_in');
+  const holdSecs = WH.HOLD_IN; // 15s
+  let holdCount = holdSecs;
+
+  soundRecovery();
+  whSetCore('満', 'recuperac.', 'ph-hold-full');
+  whSetStatus('RECUPERACIÓN · Inhala profundo', 'Llena los pulmones al máximo y aguanta 15 segundos');
+  $('whBadge').textContent = holdSecs + 's';
+
+  const rInt = setInterval(() => {
+    if (!WH.running) { clearInterval(rInt); return; }
+    holdCount--;
+    $('whPT').textContent = holdCount + 's';
+    $('whBadge').textContent = holdCount + 's';
+    if (holdCount <= 0) {
+      clearInterval(rInt);
+      soundHoldEnd();
+      WH.round++;
+      $('whBadge').style.display = 'none';
+      soundRoundDone();
+      const t = setTimeout(() => whStartRound(), 1500);
+      WH.timeouts.push(t);
+    }
+  }, 1000);
+  WH.intervals.push(rInt);
+}
+
+function whComplete() {
+  WH.running = false;
+  WH.phase = 'done';
+  whClear();
+  soundDone();
+  whSetCore('完', 'completado', '');
+  whSetStatus('🌸 Sesión completada · Protocolo Wim Hof', 'Permanece en silencio. Observa tu cuerpo.');
+  whSetPhaseUI('done');
+  $('whBtn').textContent = '再び · Repetir';
+  $('whBN').textContent = '';
+  $('whPT').textContent = '–';
+  $('whBadge').style.display = 'none';
+  // Marcar todas las rondas como done
+  document.querySelectorAll('.wh-dot').forEach(d => { d.classList.remove('cur'); d.classList.add('done'); });
+  $('whTL').textContent = '修行完了 · Práctica completada';
+}
+</script>
+</body>
+</html>
