@@ -194,7 +194,6 @@ footer p{font-size:0.62rem;color:var(--fog);letter-spacing:0.3em;text-transform:
   <div class="hero-stamp s3">道</div>
   <div class="hero-brush"></div>
   <div class="hero-mon"><span class="hero-mon-kanji">武</span></div>
-  <canvas id="sakura" style="position:absolute;inset:-100px;width:calc(100% + 200px);height:calc(100% + 200px);pointer-events:none;z-index:1;"></canvas>
   <p class="hero-eyebrow">Protocolo · Longevidad y Acero · 武士道生物学</p>
   <h1 class="hero-title">Bushidō<br>Biológico</h1>
   <p class="hero-sub">心 · 体 · 剣 · 道</p>
@@ -698,89 +697,69 @@ footer p{font-size:0.62rem;color:var(--fog);letter-spacing:0.3em;text-transform:
 </footer>
 
 <script>
-/* CANVAS — Brasas + Ceniza + Sakura */
-const cv=document.getElementById('canvas'),cx=cv.getContext('2d');
-let W,H;
-function rsz(){W=cv.width=window.innerWidth;H=cv.height=window.innerHeight;}
-rsz();window.addEventListener('resize',rsz);
+/* SAKURA CANVAS — único loop global */
+const cv = document.getElementById('canvas');
+const cx = cv.getContext('2d');
+let W, H;
+function rsz(){ W = cv.width = window.innerWidth; H = cv.height = window.innerHeight; }
+rsz();
+window.addEventListener('resize', rsz);
 
-class Particle{
-  constructor(init){this.reset(init);}
+class Petal {
+  constructor(init){ this.reset(init); }
   reset(init){
-    this.x=Math.random()*W;
-    this.y=init?Math.random()*H:H+12;
-    this.type=Math.random()<0.45?'ember':Math.random()<0.55?'ash':'sakura';
-    this.sz=this.type==='sakura'?Math.random()*3+1.5:Math.random()*1.6+0.3;
-    this.vy=-(Math.random()*0.45+0.12);
-    this.vx=(Math.random()-0.5)*0.28;
-    this.life=init?Math.random():0;
-    this.maxLife=Math.random()*0.5+0.5;
-    this.dec=Math.random()*0.0018+0.0004;
-    this.wobble=Math.random()*Math.PI*2;
-    this.wobbleSpeed=Math.random()*0.025+0.008;
-    this.rot=Math.random()*Math.PI*2;
-    this.rotSpeed=(Math.random()-0.5)*0.04;
-    this.a=0;
+    this.x = Math.random() * W;
+    this.y = init ? Math.random() * H : -12;
+    this.sz = Math.random() * 5 + 2;
+    this.vy = Math.random() * 1.0 + 0.3;
+    this.vx = (Math.random() - 0.5) * 0.7;
+    this.rot = Math.random() * Math.PI * 2;
+    this.rotSpeed = (Math.random() - 0.5) * 0.06;
+    this.wobble = Math.random() * Math.PI * 2;
+    this.wobbleSpeed = Math.random() * 0.022 + 0.007;
+    this.alpha = Math.random() * 0.55 + 0.2;
+    this.color = [
+      [255, 182, 193],
+      [255, 140, 170],
+      [240,  98, 146],
+      [219, 112, 147],
+    ][Math.floor(Math.random() * 4)];
   }
   tick(){
-    this.wobble+=this.wobbleSpeed;
-    this.rot+=this.rotSpeed;
-    this.y+=this.vy;
-    this.x+=this.vx+Math.sin(this.wobble)*0.4;
-    this.life+=this.dec;
-    const p=this.life/this.maxLife;
-    this.a=p<0.15?p/0.15:p>0.75?1-(p-0.75)/0.25:1;
-    if(this.life>=this.maxLife||this.y<-15)this.reset(false);
+    this.wobble += this.wobbleSpeed;
+    this.rot += this.rotSpeed;
+    this.y += this.vy;
+    this.x += this.vx + Math.sin(this.wobble) * 0.8;
+    if(this.y > H + 15) this.reset(false);
   }
   draw(){
-    cx.save();cx.globalAlpha=this.a*0.7;
-    if(this.type==='ember'){
-      cx.fillStyle=`rgb(${Math.floor(180+this.a*44)},${Math.floor(30+this.a*20)},10)`;
-      cx.shadowColor='#c02800';cx.shadowBlur=7;
-      cx.beginPath();cx.arc(this.x,this.y,this.sz,0,Math.PI*2);cx.fill();
-    } else if(this.type==='ash'){
-      cx.fillStyle=`rgba(80,70,90,${this.a*0.5})`;
-      cx.shadowBlur=0;
-      cx.beginPath();cx.arc(this.x,this.y,this.sz,0,Math.PI*2);cx.fill();
-    } else {
-      cx.translate(this.x,this.y);cx.rotate(this.rot);
-      cx.fillStyle=`rgba(180,80,90,${this.a*0.35})`;
-      cx.shadowBlur=0;
-      cx.beginPath();cx.ellipse(0,0,this.sz*1.4,this.sz*0.7,0,0,Math.PI*2);cx.fill();
-    }
+    const [r,g,b] = this.color;
+    cx.save();
+    cx.globalAlpha = this.alpha;
+    cx.translate(this.x, this.y);
+    cx.rotate(this.rot);
+    cx.shadowColor = `rgba(${r},${g},${b},0.4)`;
+    cx.shadowBlur = 5;
+    cx.fillStyle = `rgba(${r},${g},${b},${this.alpha})`;
+    cx.beginPath();
+    cx.ellipse(0, 0, this.sz * 1.6, this.sz * 0.75, 0, 0, Math.PI * 2);
+    cx.fill();
+    cx.globalAlpha = this.alpha * 0.25;
+    cx.strokeStyle = 'rgba(255,255,255,0.5)';
+    cx.lineWidth = 0.4;
+    cx.beginPath();
+    cx.moveTo(-this.sz * 1.4, 0);
+    cx.lineTo(this.sz * 1.4, 0);
+    cx.stroke();
     cx.restore();
   }
 }
 
-class Streak{
-  constructor(){this.active=false;this.cooldown=Math.random()*400+200;}
-  tick(){
-    this.cooldown--;
-    if(this.cooldown<=0&&!this.active){
-      this.active=true;this.x=Math.random()*W;this.y=H+5;
-      this.vy=-(Math.random()*3.5+1.8);this.vx=(Math.random()-0.5)*0.6;
-      this.life=0;this.maxLife=Math.floor(35+Math.random()*25);
-    }
-    if(!this.active)return;
-    this.y+=this.vy;this.x+=this.vx;this.life++;
-    if(this.life>=this.maxLife){this.active=false;this.cooldown=Math.random()*500+200;}
-  }
-  draw(){
-    if(!this.active)return;
-    const a=Math.min(1,(this.maxLife-this.life)/14)*0.45;
-    cx.save();cx.globalAlpha=a;
-    cx.strokeStyle='#9a1a1a';cx.shadowColor='#ff1800';cx.shadowBlur=5;cx.lineWidth=0.7;
-    cx.beginPath();cx.moveTo(this.x,this.y);cx.lineTo(this.x-this.vx*22,this.y-this.vy*22);cx.stroke();cx.restore();
-  }
-}
-
-const particles=Array.from({length:200},(_,i)=>new Particle(true));
-const streaks=[new Streak(),new Streak(),new Streak(),new Streak()];
+const petals = Array.from({ length: 250 }, (_, i) => new Petal(true));
 
 (function loop(){
-  cx.clearRect(0,0,W,H);
-  particles.forEach(p=>{p.tick();p.draw();});
-  streaks.forEach(s=>{s.tick();s.draw();});
+  cx.clearRect(0, 0, W, H);
+  petals.forEach(p => { p.tick(); p.draw(); });
   requestAnimationFrame(loop);
 })();
 
@@ -1067,82 +1046,6 @@ function whComplete() {
   document.querySelectorAll('.wh-dot').forEach(d => { d.classList.remove('cur'); d.classList.add('done'); });
   $('whTL').textContent = '修行完了 · Práctica completada';
 }
-
-/* SAKURA BEHIND TITLE */
-const skv = document.getElementById('sakura');
-const skx = skv.getContext('2d');
-
-function rszSakura(){
-  const hero = document.getElementById('hero');
-  const r = hero.getBoundingClientRect();
-  skv.width = r.width + 200;
-  skv.height = r.height + 200;
-}
-rszSakura();
-window.addEventListener('resize', rszSakura);
-
-class SakuraPetal {
-  constructor(init){
-    this.reset(init);
-  }
-  reset(init){
-    this.x = Math.random() * skv.width;
-    this.y = init ? Math.random() * skv.height : -12;
-    this.sz = Math.random() * 5 + 2;
-    this.vy = Math.random() * 1.2 + 0.4;
-    this.vx = (Math.random() - 0.5) * 0.8;
-    this.rot = Math.random() * Math.PI * 2;
-    this.rotSpeed = (Math.random() - 0.5) * 0.07;
-    this.wobble = Math.random() * Math.PI * 2;
-    this.wobbleSpeed = Math.random() * 0.025 + 0.008;
-    this.alpha = Math.random() * 0.55 + 0.25;
-    this.colorIdx = Math.floor(Math.random() * 4);
-    this.colors = [
-      [255, 182, 193],
-      [255, 140, 170],
-      [240,  98, 146],
-      [219, 112, 147],
-    ];
-  }
-  tick(){
-    this.wobble += this.wobbleSpeed;
-    this.rot += this.rotSpeed;
-    this.y += this.vy;
-    this.x += this.vx + Math.sin(this.wobble) * 0.9;
-    if(this.y > skv.height + 15) this.reset(false);
-  }
-  draw(){
-    const [r,g,b] = this.colors[this.colorIdx];
-    skx.save();
-    skx.globalAlpha = this.alpha;
-    skx.translate(this.x, this.y);
-    skx.rotate(this.rot);
-    skx.shadowColor = `rgba(${r},${g},${b},0.5)`;
-    skx.shadowBlur = 6;
-    skx.fillStyle = `rgba(${r},${g},${b},${this.alpha})`;
-    /* pétalo — doble elipse para forma más orgánica */
-    skx.beginPath();
-    skx.ellipse(0, 0, this.sz * 1.6, this.sz * 0.75, 0, 0, Math.PI * 2);
-    skx.fill();
-    /* nervio central del pétalo */
-    skx.globalAlpha = this.alpha * 0.3;
-    skx.strokeStyle = `rgba(255,255,255,0.6)`;
-    skx.lineWidth = 0.4;
-    skx.beginPath();
-    skx.moveTo(-this.sz * 1.4, 0);
-    skx.lineTo(this.sz * 1.4, 0);
-    skx.stroke();
-    skx.restore();
-  }
-}
-
-const sakuraPetals = Array.from({length: 320}, (_, i) => new SakuraPetal(true));
-
-(function sakuraLoop(){
-  skx.clearRect(0, 0, skv.width, skv.height);
-  sakuraPetals.forEach(p => { p.tick(); p.draw(); });
-  requestAnimationFrame(sakuraLoop);
-})();
 </script>
 </body>
 </html>
