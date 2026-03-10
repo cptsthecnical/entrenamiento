@@ -689,71 +689,88 @@ footer p{font-size:0.62rem;color:var(--fog);letter-spacing:0.3em;text-transform:
 </footer>
 
 <script>
-/* CANVAS EMBERS */
+/* CANVAS — Brasas + Ceniza + Sakura */
 const cv=document.getElementById('canvas'),cx=cv.getContext('2d');
 let W,H;
 function rsz(){W=cv.width=window.innerWidth;H=cv.height=window.innerHeight;}
 rsz();window.addEventListener('resize',rsz);
 
-class Ember{
-  constructor(init){
+class Particle{
+  constructor(init){this.reset(init);}
+  reset(init){
     this.x=Math.random()*W;
-    this.y=init?Math.random()*H:H+10;
-    this.sz=Math.random()*1.8+0.3;
-    this.vy=-(Math.random()*0.5+0.15);
-    this.vx=(Math.random()-0.5)*0.3;
+    this.y=init?Math.random()*H:H+12;
+    this.type=Math.random()<0.45?'ember':Math.random()<0.55?'ash':'sakura';
+    this.sz=this.type==='sakura'?Math.random()*3+1.5:Math.random()*1.6+0.3;
+    this.vy=-(Math.random()*0.45+0.12);
+    this.vx=(Math.random()-0.5)*0.28;
     this.life=init?Math.random():0;
-    this.ml=Math.random()*0.5+0.5;
-    this.dec=Math.random()*0.002+0.0005;
-    this.t=Math.random();
-    this.w=Math.random()*Math.PI*2;
-    this.ws=Math.random()*0.02+0.005;
+    this.maxLife=Math.random()*0.5+0.5;
+    this.dec=Math.random()*0.0018+0.0004;
+    this.wobble=Math.random()*Math.PI*2;
+    this.wobbleSpeed=Math.random()*0.025+0.008;
+    this.rot=Math.random()*Math.PI*2;
+    this.rotSpeed=(Math.random()-0.5)*0.04;
+    this.a=0;
   }
   tick(){
-    this.y+=this.vy; this.w+=this.ws;
-    this.x+=this.vx+Math.sin(this.w)*0.35;
+    this.wobble+=this.wobbleSpeed;
+    this.rot+=this.rotSpeed;
+    this.y+=this.vy;
+    this.x+=this.vx+Math.sin(this.wobble)*0.4;
     this.life+=this.dec;
-    const p=this.life/this.ml;
-    this.a=p<0.15?p/0.15:p>0.8?1-(p-0.8)/0.2:1;
-    if(this.life>=this.ml||this.y<-10){Object.assign(this,new Ember(false));}
+    const p=this.life/this.maxLife;
+    this.a=p<0.15?p/0.15:p>0.75?1-(p-0.75)/0.25:1;
+    if(this.life>=this.maxLife||this.y<-15)this.reset(false);
   }
   draw(){
-    cx.save();cx.globalAlpha=this.a*0.75;
-    if(this.t<0.25){cx.fillStyle=`rgb(215,${Math.floor(50+this.a*40)},10)`;cx.shadowColor='#bb2800';cx.shadowBlur=8;}
-    else if(this.t<0.5){cx.fillStyle=`rgb(${Math.floor(170+this.a*40)},${Math.floor(120+this.a*30)},15)`;cx.shadowColor='#b08010';cx.shadowBlur=5;}
-    else{cx.fillStyle=`rgba(110,90,80,${this.a*0.35})`;cx.shadowBlur=0;}
-    cx.beginPath();cx.arc(this.x,this.y,this.sz,0,Math.PI*2);cx.fill();cx.restore();
+    cx.save();cx.globalAlpha=this.a*0.7;
+    if(this.type==='ember'){
+      cx.fillStyle=`rgb(${Math.floor(180+this.a*44)},${Math.floor(30+this.a*20)},10)`;
+      cx.shadowColor='#c02800';cx.shadowBlur=7;
+      cx.beginPath();cx.arc(this.x,this.y,this.sz,0,Math.PI*2);cx.fill();
+    } else if(this.type==='ash'){
+      cx.fillStyle=`rgba(80,70,90,${this.a*0.5})`;
+      cx.shadowBlur=0;
+      cx.beginPath();cx.arc(this.x,this.y,this.sz,0,Math.PI*2);cx.fill();
+    } else {
+      cx.translate(this.x,this.y);cx.rotate(this.rot);
+      cx.fillStyle=`rgba(180,80,90,${this.a*0.35})`;
+      cx.shadowBlur=0;
+      cx.beginPath();cx.ellipse(0,0,this.sz*1.4,this.sz*0.7,0,0,Math.PI*2);cx.fill();
+    }
+    cx.restore();
   }
 }
 
-const embers=[];
-for(let i=0;i<180;i++)embers.push(new Ember(true));
-
 class Streak{
-  constructor(){this.active=false;this.next=Math.random()*300+100;this.life=0;this.maxLife=0;}
+  constructor(){this.active=false;this.cooldown=Math.random()*400+200;}
   tick(){
-    this.next--;
-    if(this.next<=0&&!this.active){
+    this.cooldown--;
+    if(this.cooldown<=0&&!this.active){
       this.active=true;this.x=Math.random()*W;this.y=H+5;
-      this.vy=-(Math.random()*3+2);this.vx=(Math.random()-0.5)*0.5;
-      this.life=0;this.maxLife=Math.floor(40+Math.random()*20);
+      this.vy=-(Math.random()*3.5+1.8);this.vx=(Math.random()-0.5)*0.6;
+      this.life=0;this.maxLife=Math.floor(35+Math.random()*25);
     }
     if(!this.active)return;
     this.y+=this.vy;this.x+=this.vx;this.life++;
-    if(this.life>=this.maxLife){this.active=false;this.next=Math.random()*400+150;}
+    if(this.life>=this.maxLife){this.active=false;this.cooldown=Math.random()*500+200;}
   }
   draw(){
     if(!this.active)return;
-    const a=Math.min(1,(this.maxLife-this.life)/12)*0.55;
-    cx.save();cx.globalAlpha=a;cx.strokeStyle='#c03800';cx.shadowColor='#ff2800';cx.shadowBlur=6;cx.lineWidth=0.8;
-    cx.beginPath();cx.moveTo(this.x,this.y);cx.lineTo(this.x-this.vx*20,this.y-this.vy*20);cx.stroke();cx.restore();
+    const a=Math.min(1,(this.maxLife-this.life)/14)*0.45;
+    cx.save();cx.globalAlpha=a;
+    cx.strokeStyle='#9a1a1a';cx.shadowColor='#ff1800';cx.shadowBlur=5;cx.lineWidth=0.7;
+    cx.beginPath();cx.moveTo(this.x,this.y);cx.lineTo(this.x-this.vx*22,this.y-this.vy*22);cx.stroke();cx.restore();
   }
 }
-const streaks=[new Streak(),new Streak(),new Streak()];
+
+const particles=Array.from({length:200},(_,i)=>new Particle(true));
+const streaks=[new Streak(),new Streak(),new Streak(),new Streak()];
 
 (function loop(){
   cx.clearRect(0,0,W,H);
-  embers.forEach(e=>{e.tick();e.draw();});
+  particles.forEach(p=>{p.tick();p.draw();});
   streaks.forEach(s=>{s.tick();s.draw();});
   requestAnimationFrame(loop);
 })();
